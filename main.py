@@ -1,6 +1,7 @@
 import pandas as pd
 import warnings
 
+pd.set_option('display.max_columns', None)
 
 warnings.filterwarnings("ignore")
 '''
@@ -34,15 +35,13 @@ df = pd.read_csv("D:\\Data_science\\Projects\\My_Car_Sales\\car_prices.csv")
 #making a copy of the data frame so that original data frame is a reference point for cleaning stages
 df_copy = df.copy(deep=True)
 
-#using regex to extract the day date and time values
-df_copy[['Day', 'Date', 'Time']] = df_copy['saledate'].str.extract(
-    r'(\w+)\s+(\w+\s+\d+\s+\d+)\s+([\d:]+)'
-)
-
+#Data removal of some rows
 #Noticed that subsection of jettas with trim SE PZEV w/connectivity are incomplete , thus decided to remove these rows
 jettas = df_copy[df_copy['trim'] == 'SE PZEV w/Connectivity']
 #print(jettas)
-df_copy.drop(df_copy[df_copy.trim == 'SE PZEV w/Connectivity'].index)
+df_copy = df_copy.drop( df_copy[df_copy['trim']=='SE PZEV w/Connectivity'].index)
+#There is a seller called kfl llc that has provided no entries on mmr, sellingprice and date so we remove them
+df_copy = df_copy.dropna(subset='saledate')
 
 #For loop for converting column types to what is required
 for column in df_copy:
@@ -53,23 +52,47 @@ for column in df_copy:
         df_copy[column].fillna("unknown",inplace=True)
         df_copy[column] = df_copy[column].astype('string')
 
-df_copy['Date'].fillna(0,inplace=True)
+#using regex to extract the day date and time values
+df_copy[['Day', 'Date', 'Time']] = df_copy['saledate'].str.extract(
+    r'(\w+)\s+(\w+\s+\d+\s+\d+)\s+([\d:]+)'
+)
 df_copy['Date'] = df_copy['Date'].str.replace(' ','-', regex=True)
-#for value in df_copy['Date']:
+#now we do not need selling date so we can drop it from the df
 
-#    print(value)
+df_copy = df_copy.drop('saledate', axis=1)
 
+print(df_copy.dtypes)
+#print(df_copy)
+#print(df_copy.info)
+
+#print('Any null values for original?\n',df.isnull().values.any(),'\n Null report for original:\n', df[df.columns[df.isnull().any()]].isnull().sum(),'\n')
+
+#print('Any null values for new?\n',df_copy.isnull().values.any(),'\n Null report for new:\n', df_copy[df_copy.columns[df_copy.isnull().any()]].isnull().sum())
+
+#checking for nulls
+#rows_with_nulls = df_copy[df_copy.isnull().any(axis=1)]
+#print(rows_with_nulls)
+
+df_copy['Date'] = pd.to_datetime(df_copy['Date'], format='%b-%d-%Y')
+df_copy['Time'] = pd.to_datetime(df_copy['Time'])
+
+print('After changing date type : \n',df_copy.dtypes)
+
+
+'''
+
+
+
+df_copy['Date'].fillna(0,inplace=True)
 
 #change Date string to dateype
 print(df_copy['Date'])
 df_copy['Date'] = pd.to_datetime(df_copy['Date'], format='%b-%d-%Y')
 #print(df_copy['Date'])
 #print(df_copy.info())
-
 '''
 
-#removal of sale date column
-df = df_copy.drop('saledate', axis=1)
+'''
 
 print(df_copy.info())
 
