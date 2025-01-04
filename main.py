@@ -61,7 +61,7 @@ df_copy['Date'] = df_copy['Date'].str.replace(' ','-', regex=True)
 
 df_copy = df_copy.drop('saledate', axis=1)
 
-print(df_copy.dtypes)
+#print(df_copy.dtypes)
 #print(df_copy)
 #print(df_copy.info)
 
@@ -76,41 +76,23 @@ print(df_copy.dtypes)
 df_copy['Date'] = pd.to_datetime(df_copy['Date'], format='%b-%d-%Y')
 df_copy['Time'] = pd.to_datetime(df_copy['Time'])
 
-print('After changing date type : \n',df_copy.dtypes)
-
-
-'''
-
-
-
-df_copy['Date'].fillna(0,inplace=True)
-
-#change Date string to dateype
-print(df_copy['Date'])
-df_copy['Date'] = pd.to_datetime(df_copy['Date'], format='%b-%d-%Y')
-#print(df_copy['Date'])
-#print(df_copy.info())
-'''
+#print('After changing date type : \n',df_copy.dtypes)
 
 '''
-
-print(df_copy.info())
-
-print(df_copy)
-
-#checking for null values
-
-print('Any null values for original?\n',df.isnull().values.any(),'\n Null report for original:\n', df[df.columns[df.isnull().any()]].isnull().sum(),'\n')
-
-print('Any null values for new?\n',df_copy.isnull().values.any(),'\n Null report for original:\n', df_copy[df.columns[df.isnull().any()]].isnull().sum())
-
-
-
 In this project we want to test whether the condition of the car,the year and the odomoter has an effect on the
 selling price and mmr
 
 Correlation testing in Pandas 
 
+first we need to create a subset of the data using integer values only
 '''
+
+df_subset = df_copy[['condition','odometer','mmr','sellingprice']].copy()
+
+#print(df_subset)
+print(df_subset.corr())
+
+#From this output we can see that odomoeter and selling price have a negative correlation
+#df_copy.to_csv('D:\\Data_science\\Projects\\My_Car_Sales\\pythonProject\\output.csv')
 
 
